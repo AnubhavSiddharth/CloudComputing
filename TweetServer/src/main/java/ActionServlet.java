@@ -87,7 +87,7 @@ public class ActionServlet extends HttpServlet {
     	String keyword = request.getParameter("key");
     	factory = new JestClientFactory();
 		factory.setHttpClientConfig(new HttpClientConfig
-		                        .Builder("https://search-tweetdata2-fhfcwpqr2s5vebvd6vcoq5lldq.us-east-1.es.amazonaws.com/")
+		                        .Builder("elasticsearch-URL")
 		                        .multiThreaded(true)
 		                        .readTimeout(60000)
 		                        .build());

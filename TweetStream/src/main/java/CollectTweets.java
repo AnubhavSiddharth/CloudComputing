@@ -21,17 +21,11 @@ import io.searchbox.core.Index;
 public class CollectTweets {
 	
 	
-	static String custKey = "Ez8kXnIMf4a2W60xO80XxWGDV";
-	static String custSecret = "459nbGPwM5ZyZgKZP1GbMQSzj5gS8m4mAvTFPyJPWD6Jl18Ysv";
-	static String accTok = "475887696-fOZXVDjD01mPRBNnGphEnkBBqkixxdFxlsnNbsXK";
-	static String accSecret = "aIXhNWfaV7cZ5OfwguCIbsJ3azMpp5xAKoK4N8cjsxgzx";
-		
-	/*
-	static String custKey = "pkDrrwOG2WR2w9Jc26iV8S6aY";
-	static String custSecret = "oNojMVuHWjR6LF6vHazmIpHhbpC5rinnaE5XItsH2aRmRtsbAu";
-	static String accTok = "475887696-qMWkg8RqcjyvPIoTPsEAOyR3wR9U9ume4ztkTLuM";
-	static String accSecret = "5UmsnQtij5k16ELTzNKv8vhybDCAgCbUTasMnXXhOur5E";
-	*/
+	static String custKey = "*";
+	static String custSecret = "*";
+	static String accTok = "*";
+	static String accSecret = "*";
+	
 
 	static List<String> words = new ArrayList<String>();
 	static JestClientFactory factory;
