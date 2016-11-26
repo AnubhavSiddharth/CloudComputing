@@ -38,23 +38,16 @@ import com.amazonaws.services.sqs.model.SendMessageResult;
 
 public class CollectTweets {
 
-	static String custKey = "Ez8kXnIMf4a2W60xO80XxWGDV";
-	static String custSecret = "459nbGPwM5ZyZgKZP1GbMQSzj5gS8m4mAvTFPyJPWD6Jl18Ysv";
-	static String accTok = "475887696-fOZXVDjD01mPRBNnGphEnkBBqkixxdFxlsnNbsXK";
-	static String accSecret = "aIXhNWfaV7cZ5OfwguCIbsJ3azMpp5xAKoK4N8cjsxgzx";
+	static String custKey = "*";
+	static String custSecret = "*";
+	static String accTok = "*";
+	static String accSecret = "*";
 
-	/*
-	 * static String custKey = "pkDrrwOG2WR2w9Jc26iV8S6aY"; static String
-	 * custSecret = "oNojMVuHWjR6LF6vHazmIpHhbpC5rinnaE5XItsH2aRmRtsbAu"; static
-	 * String accTok = "475887696-qMWkg8RqcjyvPIoTPsEAOyR3wR9U9ume4ztkTLuM";
-	 * static String accSecret =
-	 * "5UmsnQtij5k16ELTzNKv8vhybDCAgCbUTasMnXXhOur5E";
-	 */
 
 	static List<String> words = new ArrayList<String>();
 	static JestClientFactory factory;
 	static JestClient client;
-	static String myQueueUrl = "https://sqs.us-east-1.amazonaws.com/333363708195/TweetQueue";
+	static String myQueueUrl = "*";
 
 	public static void main(String[] args) {
 
@@ -111,18 +104,6 @@ public class CollectTweets {
 							System.out.println("found = " + word + " : loc " + latLong);
 							System.out.println("Cont = " + content);
 
-							/*
-							 * String source = jsonBuilder() .startObject()
-							 * .field("username", username) .field("tweetid",
-							 * tweetId) .field("content", content)
-							 * .field("keyword", word) .field("latitude",
-							 * latitude) .field("longitude", longitude).field("sentiment", sentiment)
-							 * .endObject().string();
-							 * 
-							 * Index index = new
-							 * Index.Builder(source).index("tweetdata").type(
-							 * "tweet").build(); client.execute(index);
-							 */
 
 							SendMessageRequest sendMessageRequest = new SendMessageRequest();
 							sendMessageRequest.withQueueUrl(myQueueUrl);
@@ -140,7 +121,7 @@ public class CollectTweets {
 
 		factory = new JestClientFactory();
 		factory.setHttpClientConfig(new HttpClientConfig.Builder(
-				"https://search-tweetsentiment-klny5bkplkqihaitghiyl3hsfm.us-east-1.es.amazonaws.com/").multiThreaded(true)
+				"*").multiThreaded(true)
 						.readTimeout(60000).build());
 		client = factory.getObject();
 

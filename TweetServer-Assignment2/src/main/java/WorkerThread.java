@@ -21,9 +21,9 @@ import org.json.simple.JSONObject;
 public class WorkerThread implements Runnable {
 
 	ReceiveMessageResult message;
-	static String arn = "arn:aws:sns:us-east-1:333363708195:TweetTrend";
-	static String aws_access_key_id = "AKIAJTB55RI4FSP2TX7Q";
-	static String aws_secret_access_key = "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";
+	static String arn = "*";
+	static String aws_access_key_id = "*";
+	static String aws_secret_access_key = "*";
 	//create a new SNS client and set endpoint
 	BasicAWSCredentials credentials = new BasicAWSCredentials(aws_access_key_id, aws_secret_access_key);
 	AmazonSNSClient snsClient = new AmazonSNSClient(credentials);
@@ -41,7 +41,7 @@ public class WorkerThread implements Runnable {
 		String content = msg.getBody();
 		
 		AlchemyLanguage service = new AlchemyLanguage();
-		service.setApiKey("b4e9c20260c444b37c1a34a8265b04f4e17dce4d");
+		service.setApiKey("*");
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put(AlchemyLanguage.TEXT, content);
 		DocumentSentiment sentiment = service.getSentiment(params).execute();

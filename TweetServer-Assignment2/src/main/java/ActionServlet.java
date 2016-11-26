@@ -128,7 +128,7 @@ public class ActionServlet extends HttpServlet {
 		String keyword = request.getParameter("key");
 		factory = new JestClientFactory();
 		factory.setHttpClientConfig(new HttpClientConfig.Builder(
-				"https://search-tweetsentiment-klny5bkplkqihaitghiyl3hsfm.us-east-1.es.amazonaws.com/").multiThreaded(true)
+				"*").multiThreaded(true)
 						.readTimeout(60000).build());
 		client = factory.getObject();
 

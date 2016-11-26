@@ -23,9 +23,9 @@ import com.amazonaws.services.sqs.model.ReceiveMessageResult;
 @WebServlet("/QueueProcessor")
 public class QueueProcessor extends HttpServlet {
 
-	static String myQueueUrl = "https://sqs.us-east-1.amazonaws.com/333363708195/TweetQueue";
-	static String aws_access_key_id = "AKIAJTB55RI4FSP2TX7Q";
-	static String aws_secret_access_key = "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";
+	static String myQueueUrl = "*";
+	static String aws_access_key_id = "*";
+	static String aws_secret_access_key = "*";
 
 	@Override
 	public void init() throws ServletException {

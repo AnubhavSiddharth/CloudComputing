@@ -41,7 +41,7 @@ public class NotifyServlet extends HttpServlet {
 
 			factory = new JestClientFactory();
 			factory.setHttpClientConfig(new HttpClientConfig.Builder(
-					"https://search-tweetsentiment-klny5bkplkqihaitghiyl3hsfm.us-east-1.es.amazonaws.com/")
+					"*")
 							.multiThreaded(true).readTimeout(60000).build());
 			client = factory.getObject();
 
