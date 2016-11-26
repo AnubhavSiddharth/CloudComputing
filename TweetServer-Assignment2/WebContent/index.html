@@ -1,0 +1,254 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<script type="text/javascript"
+	src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+<script
+	src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization&key=AIzaSyANj2vzVYym_HTgClFzr-1iNhJADIaez9Q"></script>
+
+<script>
+	var map, pointarray, heatmap;
+	var latlongData = [];
+    var tweet_text = [];
+    var sentiment_response = [];
+	var cur_zoom = 2;
+	var cur_centre = new google.maps.LatLng(40.52, 4.34);
+	var is_bounds_changed = false;
+
+	function initialize() {
+		if (map)
+			cur_zoom = map.getZoom();
+		var mapOptions = {
+			zoom : cur_zoom,
+			center : new google.maps.LatLng(40.52, 4.34),
+			mapTypeId : google.maps.MapTypeId.ROADMAP
+		};
+		map = new google.maps.Map(document.getElementById('map-canvas'),
+				mapOptions);
+
+		google.maps.event.addListener(map, "rightclick", function(event) {
+			if (document.getElementById('heatMap').checked) {
+				heat();
+			} else if (document.getElementById('pinMap').checked) {
+				pin();
+			}
+		});
+
+		google.maps.event.addListener(map, "click", function(event) {
+			var lat1_deg = event.latLng.lat();
+			var lng1_deg = event.latLng.lng();
+			cur_centre = new google.maps.LatLng(lat1_deg, lng1_deg);
+
+			user_radius = document.getElementById('radius').value; //in kms
+			earth_radius = 6371; //in kms
+			k = 0;
+			newLatlongData = [];
+
+			for (i = 0; i < latlongData.length; i++) {
+				lat1 = (Math.PI * lat1_deg) / 180;
+				lng1 = (Math.PI * lng1_deg) / 180;
+
+				var lat2 = latlongData[i].lat();
+				var lng2 = latlongData[i].lng();
+				lat2 = (Math.PI * lat2) / 180;
+				lng2 = (Math.PI * lng2) / 180;
+
+				dist = Math.acos((Math.sin(lat1) * Math.sin(lat2))
+						+ (Math.cos(lat1) * Math.cos(lat2) * Math.cos(lng1
+								- lng2)))
+						* earth_radius;
+				if (dist <= user_radius) {
+					newLatlongData[k++] = latlongData[i];
+				}
+			}
+
+			initialize();
+
+			var myCity = new google.maps.Circle({
+				strokeColor : '#FF0000',
+				strokeOpacity : 0.8,
+				strokeWeight : 2,
+				fillColor : '#FF0000',
+				fillOpacity : 0.25,
+				map : map,
+				center : new google.maps.LatLng(lat1_deg, lng1_deg),
+				radius : user_radius * 1000
+			});
+
+			if (document.getElementById('heatMap').checked) {
+				heatNew(newLatlongData);
+			} else if (document.getElementById('pinMap').checked) {
+				pinNew(newLatlongData);
+			}
+
+		});
+
+	} //end of initialize
+
+	function editMarkers(marker, i) {
+
+		var marker_color = "blue";
+		if (sentiment_response[i].toLowerCase() === "positive")
+			marker_color = "green";
+		else if (sentiment_response[i].toLowerCase() === "negative")
+			marker_color = "red";
+		else
+			marker_color = "blue";
+
+		marker_icon_url = "http://maps.google.com/mapfiles/ms/icons/" + marker_color + "-dot.png";
+		marker.setIcon(marker_icon_url);
+
+		var contentString = '<div id="content">'
+				+ '<div id="siteNotice"></div>'
+				+ '<h1 id="firstHeading" style="color:'+marker_color+'" class="firstHeading">'
+				+ sentiment_response[i]
+				+ '</h1>'
+				+ '<div id="bodyContent" style="font-size: 13px;font-weight: bold">'
+				+ '<p>' + tweet_text[i] + '</h5>' + '</div>' + '</div>';
+
+		var infowindow = new google.maps.InfoWindow({
+			content : contentString
+		});
+
+		marker.addListener('click', function() {
+			infowindow.open(map, marker);
+		});
+	}
+
+	function pin() {
+		initialize();
+		for (i = 0; i < latlongData.length; i++) {
+			var latD = latlongData[i].lat();
+			var lngD = latlongData[i].lng();
+			marker = new google.maps.Marker({
+				position : new google.maps.LatLng(latD, lngD),
+				map : map
+			});
+			editMarkers(marker, i);
+		}
+	}
+
+	function pinNew(newLatlongData) {
+		for (i = 0; i < newLatlongData.length; i++) {
+			var latD = newLatlongData[i].lat();
+			var lngD = newLatlongData[i].lng();
+			marker = new google.maps.Marker({
+				position : new google.maps.LatLng(latD, lngD),
+				map : map
+			});
+			editMarkers(marker, i);
+		}
+	}
+
+	function heat() {
+		initialize();
+		var pointArray = new google.maps.MVCArray(latlongData);
+		heatmap = new google.maps.visualization.HeatmapLayer({
+			data : pointArray,
+			radius : 25
+		});
+		heatmap.setMap(map);
+	}
+
+	function heatNew(newLatlongData) {
+		var pointArray = new google.maps.MVCArray(newLatlongData);
+		heatmap = new google.maps.visualization.HeatmapLayer({
+			data : pointArray,
+			radius : 25
+		});
+		heatmap.setMap(map);
+	}
+
+	function elasticSearch(searchkey) {
+		if (searchkey == " -Select- ") {
+			latlongData = [];
+			initialize();
+		} else {
+			$.ajax({
+				url : 'ActionServlet',
+				data : {
+					key : searchkey
+				// will be accessible in $_POST['data1']
+				},
+				type : 'GET',
+				success : function(responseJson) {
+					var jsonResponse = $
+							.parseJSON(JSON.stringify(responseJson));
+					latlongData = [];
+					tweet_text = [];
+					keyword = [];
+					sentiment_response = [];
+					for (var i = 0; i < jsonResponse.length; i++) {
+						latlongData[i] = new google.maps.LatLng(
+								jsonResponse[i].latitude,
+								jsonResponse[i].longitude);
+						tweet_text[i] = jsonResponse[i].content;
+						keyword[i] = jsonResponse[i].keyword;
+						sentiment_response[i] = jsonResponse[i].sentiment;
+					}
+					if (document.getElementById('heatMap').checked)
+						heat();
+					else if (document.getElementById('pinMap').checked)
+						pin();
+				},
+				error : function(error) {
+					console.log(error);
+				}
+			});
+		}
+	}
+
+	/*
+	 $(document).on('click', '.toggle-button', function() {
+	 $(this).toggleClass('toggle-button-selected');
+	 });
+	 */
+
+	google.maps.event.addDomListener(window, 'load', initialize);
+</script>
+
+<title>Tweet Map</title>
+</head>
+<body>
+	<form id="form1">
+		<div id="div1"
+			style="position: absolute; left: 5px; top: 50px; width: 90px">
+		</div>
+
+		<h4>Keyword</h4>
+		<div>
+			<select id="key" onchange="elasticSearch(this.value);">
+				<option selected="true" value="select">-Select-</option>
+				<option value="trump">Trump</option>
+				<option value="hillary">Hillary</option>
+				<option value="india">India</option>
+				<option value="obama">Obama</option>
+				<option value="computer">Computer</option>
+				<option value="google">Google</option>
+				<option value="ronaldo">Ronaldo</option>
+				<option value="new york">New York</option>
+				<!--  <option value="a">A</option> -->
+			</select>
+		</div>
+
+		<br>
+
+		<form style="position: absolute; left: 10px; top: 20px; color: white">
+			<input type="radio" name="one" id="heatMap" checked="checked"
+				onclick="heat()"> Heat Map <br> <input type="radio"
+				name="one" id="pinMap" onclick="pin()"> Pin Map
+		</form>
+
+		----------------------
+
+		<h4>Radius:</h4>
+		<input type="text" name="radius" id="radius" style="width: 30px;" />
+
+		<div id="map-canvas"
+			style="position: absolute; left: 150px; top: 10px; width: 1050px; height: 570px">
+		</div>
+	</form>
+</body>
+</html>
